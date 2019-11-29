@@ -1,7 +1,7 @@
 const config = {
   cell: {
-    width: 50,
-    height: 40
+    width: 18,
+    height: 20
   },
   zoom: 1,
   way: {

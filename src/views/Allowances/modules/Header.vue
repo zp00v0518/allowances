@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import { Canvas, config, time } from "../utils";
+import { Canvas, config, time } from '../utils';
 
 export default {
-  name: "Header",
+  name: 'Header',
   data() {
     return {
       canvas: null,
@@ -65,7 +65,7 @@ export default {
         return;
       }
       const { cell, zoom } = config;
-      const num_add_cell = Math.ceil(Math.abs(distance) / (cell.width * zoom));
+      let num_add_cell = Math.ceil(Math.abs(distance) / (cell.width * zoom));
       if (way === config.way.left) {
         drawIndex.first += num_add_cell;
         drawIndex.last = drawIndex.first + num;
@@ -81,7 +81,7 @@ export default {
         if (drawIndex.first < 0) {
           this.addDataToArr(way, Math.abs(drawIndex.first));
           drawIndex.first = 0;
-        drawIndex.last = num;
+          drawIndex.last = num;
         }
       }
     },
@@ -129,14 +129,14 @@ export default {
       const { canvas, drawIndex, swipe } = this;
       const { cell, zoom } = config;
       const cellWidth = cell.width * zoom;
-      const cellHeight = cell.height * zoom;
+      const cellHeight = (canvas.$height / 2) * zoom;
       let count = 0;
       for (let i = drawIndex.first; i < drawIndex.last; i++) {
         const item = this.arrData[i];
         this.drawOneDay({
           ctx,
           startX: count * cellWidth,
-          startY: 0,
+          startY: canvas.$height / 2,
           width: cellWidth,
           height: cellHeight,
           day: item.date
@@ -145,26 +145,39 @@ export default {
       }
     },
     drawOneDay({ ctx, startX, startY, width, height, day }) {
-      ctx.fillStyle = "transparent";
+      ctx.fillStyle = 'transparent';
       const date = new Date(day);
+      const month = date.getMonth();
+      const middleDay = Math.floor(time.dayInMonth[month] / 2);
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        ctx.fillStyle = "grey";
+        ctx.fillStyle = 'grey';
       }
       ctx.fillRect(startX, startY, width, height);
-      this.drawBorder({ ctx, startX, startY, width, height });
-      ctx.fillStyle = "black";
+      this.drawBorder({ ctx, startX, startY, width, height, day });
+      ctx.fillStyle = 'black';
       const num = date.getDate();
-      const month = date.getMonth();
-      const str = `${num}-${month+1}`
-      this.drawTxt({ ctx, startX, startY, width, height, txt: str });
+      this.drawTxt({ ctx, startX, startY, width, height: ctx.canvas.height /2, txt: num });
+      if (num === middleDay) {
+        const monthName = time.fullMonths[month];
+        this.drawTxt({ ctx, startX, startY:0, width, height: ctx.canvas.height /2, txt: monthName });
+      }
     },
-    drawBorder({ ctx, startX, startY, width, height }) {
+    drawBorder({ ctx, startX, startY, width, height, day }) {
+      const date = new Date(day).getDate();
       ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(startX + width, startY);
-      ctx.lineTo(startX + width, startY + height);
-      ctx.lineTo(startX, startY + height);
+      if (date !== 1) {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX + width, startY);
+        ctx.lineTo(startX + width, startY + height);
+        ctx.lineTo(startX, startY + height);
+      } else {
+        ctx.moveTo(startX, 0);
+        ctx.lineTo(startX, ctx.canvas.height);
+        ctx.lineTo(startX + width, ctx.canvas.height);
+        ctx.lineTo(startX + width, startY);
+        ctx.lineTo(startX, startY);
+      }
       // ctx.lineTo(startX, startY);
       ctx.lineWidth = 1;
       ctx.stroke();
@@ -176,21 +189,21 @@ export default {
       startY,
       width,
       height,
-      txt = "",
-      align = "center",
+      txt = '',
+      align = 'center',
       size = 10
     }) {
       let x = startX;
       let y = startY;
       ctx.textAlign = align;
-      if (align === "center") {
+      if (align === 'center') {
         x += width / 2;
         y += height / 2;
-        ctx.textBaseline = "middle";
+        ctx.textBaseline = 'middle';
       }
       if (size) {
         const font = Math.round(size + config.zoom);
-        ctx.font = font + "px Nunito";
+        ctx.font = font + 'px Nunito';
       }
       ctx.fillText(txt, x, y);
     },
@@ -209,23 +222,23 @@ export default {
     },
     setMouseDown(e) {
       const { swipe } = this;
-      if (e.type === "mousedown") {
+      if (e.type === 'mousedown') {
+        this.$refs.canvas.style.cursor = 'grab';
         swipe.isMouseDown = true;
         swipe.prevPosition.x = e.pageX;
         swipe.time = new Date().getTime();
-        this.$refs.canvas.style.cursor = "grab";
       }
-      if (e.type === "mouseup" || e.type === "mouseleave") {
+      if (e.type === 'mouseup' || e.type === 'mouseleave') {
+        this.$refs.canvas.style.cursor = 'default';
         swipe.isMouseDown = false;
         swipe.time = null;
-        this.$refs.canvas.style.cursor = "default";
       }
     },
     handlerMouseMove(event) {
       const { swipe } = this;
       if (!swipe.isMouseDown) return;
       const curTime = new Date().getTime();
-      if (curTime - swipe.time < 50) return;
+      if (curTime - swipe.time < 100) return;
       swipe.time = curTime;
       swipe.way = this.checkWay(event, swipe.prevPosition) || swipe.way;
       this.setIndexForDraw(swipe.way, swipe.prevPosition.distance);
@@ -249,11 +262,11 @@ export default {
     requestAnimationFrame(() => {
       this.draw();
     });
-    this.$refs.canvas.addEventListener("wheel", this.zoomingCanvas);
-    this.$refs.canvas.addEventListener("mousedown", this.setMouseDown);
-    this.$refs.canvas.addEventListener("mouseup", this.setMouseDown);
-    this.$refs.canvas.addEventListener("mouseleave", this.setMouseDown);
-    this.$refs.canvas.addEventListener("mousemove", this.handlerMouseMove);
+    this.$refs.canvas.addEventListener('wheel', this.zoomingCanvas);
+    this.$refs.canvas.addEventListener('mousedown', this.setMouseDown);
+    this.$refs.canvas.addEventListener('mouseup', this.setMouseDown);
+    this.$refs.canvas.addEventListener('mouseleave', this.setMouseDown);
+    this.$refs.canvas.addEventListener('mousemove', this.handlerMouseMove);
   }
 };
 </script>

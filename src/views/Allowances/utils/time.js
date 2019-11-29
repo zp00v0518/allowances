@@ -4,8 +4,29 @@ const hour = minute * 60;
 const day = hour * 24;
 const week = day * 7;
 const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const fullDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const shortMonths = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const fullDays = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
+];
+const shortMonths = [
+  'jan',
+  'feb',
+  'mar',
+  'apr',
+  'may',
+  'jun',
+  'jul',
+  'aug',
+  'sep',
+  'oct',
+  'nov',
+  'dec'
+];
 const fullMonths = [
   'january',
   'february',
@@ -18,8 +39,9 @@ const fullMonths = [
   'september',
   'october',
   'november',
-  'december',
+  'december'
 ];
+const dayInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const getLeapYear = date => {
   const year = date instanceof Date ? new Date(date).getFullYear() : date;
@@ -38,6 +60,7 @@ const time = {
   fullDays,
   getLeapYear,
   lowercaseShortDays: shortDays.map(d => d.toLowerCase()),
+  dayInMonth
 };
 
 export default time;
