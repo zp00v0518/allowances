@@ -153,7 +153,9 @@ export default {
       this.drawBorder({ ctx, startX, startY, width, height });
       ctx.fillStyle = "black";
       const num = date.getDate();
-      this.drawTxt({ ctx, startX, startY, width, height, txt: num });
+      const month = date.getMonth();
+      const str = `${num}-${month+1}`
+      this.drawTxt({ ctx, startX, startY, width, height, txt: str });
     },
     drawBorder({ ctx, startX, startY, width, height }) {
       ctx.beginPath();
