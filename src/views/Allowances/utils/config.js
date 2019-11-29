@@ -1,5 +1,5 @@
 const config = {
-  day: {
+  cell: {
     width: 18,
     height: 20
   },

@@ -21,14 +21,17 @@ export default {
       date: new Date(),
       arrData: [],
       drawArr: [],
-      first_draw_index: 0,
+      drawIndex: {
+        first: 0,
+        last: 0
+      },
       swipe: {
         isMouseDown: false,
         time: null,
         prevPosition: {
           x: null,
           y: null,
-          distance: null
+          distance: 0
         },
         way: null
       }
@@ -38,8 +41,8 @@ export default {
   methods: {
     getNumCell() {
       const width = this.canvas.$width;
-      const { day, zoom } = config;
-      const num = Math.ceil(parseFloat(width) / (day.width * zoom));
+      const { cell, zoom } = config;
+      const num = Math.ceil(parseFloat(width) / (cell.width * zoom));
       return num;
     },
     createArrData(num = this.getNumCell()) {
@@ -53,13 +56,53 @@ export default {
         curDate += time.day;
       }
     },
-    getIndexForDraw() {
+    setIndexForDraw(way, distance) {
+      const { drawIndex } = this;
       const num = this.getNumCell();
-      const template = {
-        startIndex: this.first_draw_index,
-        endIndex: num
-      };
-      return template;
+      if (way === undefined) {
+        drawIndex.first = 0;
+        drawIndex.last = num;
+        return;
+      }
+      const { cell, zoom } = config;
+      const num_add_cell = Math.ceil(Math.abs(distance) / (cell.width * zoom));
+      if (way === config.way.left) {
+        drawIndex.first += num_add_cell;
+        drawIndex.last = drawIndex.first + num;
+        if (drawIndex.last > this.arrData.length) {
+          this.addDataToArr(way, drawIndex.last - this.arrData.length);
+        }
+      } else if (way === config.way.right) {
+        // const firstDraw = this.arrData[drawIndex.first].date;
+        const curIndex = drawIndex.first;
+        const dif = curIndex - num_add_cell;
+        if (dif < 0) {
+          this.addDataToArr(way, Math.abs(dif));
+        }
+        drawIndex.first = 0;
+        drawIndex.last = num;
+      }
+    },
+    addDataToArr(way, num) {
+      const { arrData, drawIndex } = this;
+      let lastDate;
+      if (way === config.way.left) {
+        lastDate = arrData[arrData.length - 1].date;
+      }
+      if (way === config.way.right) {
+        lastDate = arrData[0].date;
+      }
+      for (let i = 0; i < num; i++) {
+        const d = {};
+        if (way === config.way.left) {
+          d.date = lastDate + time.day * (i + 1);
+          arrData.push(d);
+        }
+        if (way === config.way.right) {
+          d.date = lastDate - time.day * (i + 1);
+          arrData.unshift(d);
+        }
+      }
     },
     init() {
       this.canvas = new Canvas(this.$refs.canvas);
@@ -76,34 +119,40 @@ export default {
       if (this.isDraw) return;
       this.isDraw = true;
       this.canvas.clear();
-      this.drawAllDays({ ctx: this.canvas.$ctx, startDate: this.date });
+      const startDate = this.arrData[this.drawIndex.first].date;
+      this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
       this.isDraw = false;
     },
     drawAllDays({ ctx, startDate }) {
-      const { canvas } = this;
-      const { day, zoom } = config;
-      const cellWidth = day.width * zoom;
-      const cellHeight = day.height * zoom;
-      const drawIndex = this.getIndexForDraw();
-
-      for (let i = drawIndex.startIndex; i < drawIndex.endIndex; i++) {
+      const { canvas, drawIndex, swipe } = this;
+      const { cell, zoom } = config;
+      const cellWidth = cell.width * zoom;
+      const cellHeight = cell.height * zoom;
+      let count = 0;
+      for (let i = drawIndex.first; i < drawIndex.last; i++) {
         const item = this.arrData[i];
         this.drawOneDay({
           ctx,
-          startX: i * cellWidth,
+          startX: count * cellWidth,
           startY: 0,
           width: cellWidth,
           height: cellHeight,
           day: item.date
         });
+        count++;
       }
     },
     drawOneDay({ ctx, startX, startY, width, height, day }) {
       ctx.fillStyle = "transparent";
+      const date = new Date(day);
+      const dayOfWeek = date.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        ctx.fillStyle = "grey";
+      }
       ctx.fillRect(startX, startY, width, height);
       this.drawBorder({ ctx, startX, startY, width, height });
       ctx.fillStyle = "black";
-      const num = new Date(day).getDate();
+      const num = date.getDate();
       this.drawTxt({ ctx, startX, startY, width, height, txt: num });
     },
     drawBorder({ ctx, startX, startY, width, height }) {
@@ -158,44 +207,44 @@ export default {
       const { swipe } = this;
       if (e.type === "mousedown") {
         swipe.isMouseDown = true;
+        swipe.prevPosition.x = e.pageX;
         swipe.time = new Date().getTime();
+        this.$refs.canvas.style.cursor = "grab";
       }
       if (e.type === "mouseup" || e.type === "mouseleave") {
         swipe.isMouseDown = false;
         swipe.time = null;
+        this.$refs.canvas.style.cursor = "default";
       }
     },
     handlerMouseMove(event) {
       const { swipe } = this;
       if (!swipe.isMouseDown) return;
       const curTime = new Date().getTime();
-      if (curTime - swipe.time < 200) return;
+      if (curTime - swipe.time < 50) return;
       swipe.time = curTime;
       swipe.way = this.checkWay(event, swipe.prevPosition) || swipe.way;
-      swipe.prevPosition.distance = this.checkDistance(event, swipe.prevPosition);
-
+      this.setIndexForDraw(swipe.way, swipe.prevPosition.distance);
+      this.draw();
     },
     checkWay(e, prevPosition = this.swipe.prevPosition) {
       const curX = e.pageX;
       const prevX = prevPosition.x;
+      prevPosition.distance = curX - prevX;
       prevPosition.x = curX;
       if (prevX < curX) {
         return config.way.right;
       }
       if (prevX > curX) return config.way.left;
-    },
-    checkDistance(e, prevPosition = this.swipe.prevPosition) {
-      const curX = e.pageX;
-      if (prevPosition.distance === null){
-        prevPosition.distance = curX;
-      }
-      return curX - prevPosition.distance;
     }
   },
   mounted() {
     this.init();
     this.createArrData();
-    this.draw();
+    this.setIndexForDraw();
+    requestAnimationFrame(()=>{
+      this.draw();
+    })
     this.$refs.canvas.addEventListener("wheel", this.zoomingCanvas);
     this.$refs.canvas.addEventListener("mousedown", this.setMouseDown);
     this.$refs.canvas.addEventListener("mouseup", this.setMouseDown);
