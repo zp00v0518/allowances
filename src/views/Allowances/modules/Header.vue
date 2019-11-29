@@ -18,7 +18,7 @@ export default {
     return {
       canvas: null,
       isDraw: false,
-      date: new Date().getTime(),
+      date: new Date(),
     };
   },
   methods: {
@@ -47,7 +47,7 @@ export default {
       const cellHeight = day.height * zoom;
       let x = 0;
       let y = 0;
-      let curDate = startDate;
+      let curDate = startDate.getTime();
       let oneDay = 1000 * 60 * 60 * 24;
 
       for (let i = 0; i < canvas.$width; i += cellWidth) {
@@ -63,9 +63,12 @@ export default {
       }
     },
     drawOneDay({ ctx, startX, startY, width, height, day }) {
-      ctx.fillStyle = 'red';
+      ctx.fillStyle = 'transparent';
       ctx.fillRect(startX, startY, width, height);
       this.drawBorder({ ctx, startX, startY, width, height });
+      ctx.fillStyle = 'black';
+      const num = new Date(day).getDate();
+      this.drawTxt({ctx, startX, startY, width, height, txt: num});
     },
     drawBorder({ ctx, startX, startY, width, height }) {
       ctx.beginPath();
@@ -73,12 +76,26 @@ export default {
       ctx.lineTo(startX + width, startY);
       ctx.lineTo(startX + width, startY + height);
       ctx.lineTo(startX, startY + height);
-      ctx.lineTo(startX, startY);
+      // ctx.lineTo(startX, startY);
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.beginPath();
     },
-    drawTxt({ctx,}){},
+    drawTxt({ctx, startX, startY, width, height, txt= '', align = 'center', size = 10}){
+      let x = startX;
+      let y = startY;
+      ctx.textAlign = align;
+      if (align === "center"){
+        x += width / 2;
+        y += height / 2;
+        ctx.textBaseline = "middle";
+      }
+      if (size){
+        const font = Math.round(size + config.zoom);
+        ctx.font = font + 'px Nunito';
+      }
+      ctx.fillText(txt, x, y);
+    },
     zoomingCanvas(event) {
       const { wheelDelta } = event;
       const zoomStep = 0.2;
