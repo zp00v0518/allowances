@@ -1,4 +1,5 @@
 import Canvas from './Canvas';
 import config from './config';
+import time from './time';
 
-export { Canvas, config };
+export { Canvas, config, time };
