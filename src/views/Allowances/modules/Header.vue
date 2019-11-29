@@ -75,12 +75,14 @@ export default {
       } else if (way === config.way.right) {
         // const firstDraw = this.arrData[drawIndex.first].date;
         const curIndex = drawIndex.first;
-        const dif = curIndex - num_add_cell;
-        if (dif < 0) {
-          this.addDataToArr(way, Math.abs(dif));
-        }
-        drawIndex.first = 0;
+        // const dif = curIndex - num_add_cell;
+        drawIndex.first = curIndex - num_add_cell;
+        drawIndex.last = drawIndex.first + num;
+        if (drawIndex.first < 0) {
+          this.addDataToArr(way, Math.abs(drawIndex.first));
+          drawIndex.first = 0;
         drawIndex.last = num;
+        }
       }
     },
     addDataToArr(way, num) {
@@ -242,9 +244,9 @@ export default {
     this.init();
     this.createArrData();
     this.setIndexForDraw();
-    requestAnimationFrame(()=>{
+    requestAnimationFrame(() => {
       this.draw();
-    })
+    });
     this.$refs.canvas.addEventListener("wheel", this.zoomingCanvas);
     this.$refs.canvas.addEventListener("mousedown", this.setMouseDown);
     this.$refs.canvas.addEventListener("mouseup", this.setMouseDown);
