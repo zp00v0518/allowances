@@ -10,34 +10,12 @@
 </template>
 
 <script>
+import baseFunc from './baseFunc';
 import { Canvas, config, time } from '../utils';
 
 export default {
   name: 'Header',
-  data() {
-    return {
-      canvas: null,
-      isDraw: false,
-      date: new Date(),
-      arrData: [],
-      drawArr: [],
-      drawIndex: {
-        first: 0,
-        last: 0
-      },
-      swipe: {
-        isMouseDown: false,
-        time: null,
-        prevPosition: {
-          x: null,
-          y: null,
-          distance: 0
-        },
-        way: null
-      }
-    };
-  },
-
+  mixins: [baseFunc],
   methods: {
     getNumCell() {
       const width = this.canvas.$width;
@@ -117,13 +95,19 @@ export default {
       const { width, height } = styles;
       return { width: parseFloat(width), height: parseFloat(height) };
     },
-    draw() {
-      if (this.isDraw) return;
-      this.isDraw = true;
-      this.canvas.clear();
-      const startDate = this.arrData[this.drawIndex.first].date;
-      this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
-      this.isDraw = false;
+    draw(timestamp) {
+      const now = new Date().getTime();
+      if (!this.timer) {
+        this.timer = now;
+      }
+      const progress = now - this.timer;
+      if (progress > 50) {
+        this.canvas.clear();
+        const startDate = this.arrData[this.drawIndex.first].date;
+        this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
+        this.timer = now;
+      }
+      this.requestId = requestAnimationFrame(this.draw);
     },
     drawAllDays({ ctx, startDate }) {
       const { canvas, drawIndex, swipe } = this;
@@ -157,10 +141,24 @@ export default {
       this.drawBorder({ ctx, startX, startY, width, height, day });
       ctx.fillStyle = 'black';
       const num = date.getDate();
-      this.drawTxt({ ctx, startX, startY, width, height: ctx.canvas.height /2, txt: num });
+      this.drawTxt({
+        ctx,
+        startX,
+        startY,
+        width,
+        height: ctx.canvas.height / 2,
+        txt: num
+      });
       if (num === middleDay) {
         const monthName = time.fullMonths[month];
-        this.drawTxt({ ctx, startX, startY:0, width, height: ctx.canvas.height /2, txt: monthName });
+        this.drawTxt({
+          ctx,
+          startX,
+          startY: 0,
+          width,
+          height: ctx.canvas.height / 2,
+          txt: monthName
+        });
       }
     },
     drawBorder({ ctx, startX, startY, width, height, day }) {
@@ -218,7 +216,7 @@ export default {
       if (config.zoom < 1) {
         config.zoom = 1;
       }
-      this.draw();
+      // this.draw();
     },
     setMouseDown(e) {
       const { swipe } = this;
@@ -259,14 +257,15 @@ export default {
     this.init();
     this.createArrData();
     this.setIndexForDraw();
-    requestAnimationFrame(() => {
-      this.draw();
-    });
+    requestAnimationFrame(this.draw);
     this.$refs.canvas.addEventListener('wheel', this.zoomingCanvas);
     this.$refs.canvas.addEventListener('mousedown', this.setMouseDown);
     this.$refs.canvas.addEventListener('mouseup', this.setMouseDown);
     this.$refs.canvas.addEventListener('mouseleave', this.setMouseDown);
     this.$refs.canvas.addEventListener('mousemove', this.handlerMouseMove);
+  },
+  beforeMount () {
+    cancelAnimationFrame(this.requestID)
   }
 };
 </script>
@@ -276,12 +275,15 @@ export default {
   display: flex;
   height: 50px;
   &__search {
+    min-width: 200px;
     border: 1px solid;
+    border-left: none;
+    border-top: none;
     box-sizing: border-box;
   }
   &__canvas-container {
-    flex: 3;
-    width: 100%;
+    flex: 2;
+    // width: 100%;
     // overflow: hidden;
     // overflow-x: scroll;
   }
