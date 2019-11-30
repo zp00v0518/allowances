@@ -4,9 +4,14 @@
       :drawArr="arrData"
       :startIndex="drawIndex.first"
       :endIndex="drawIndex.last"
+      v-if="isPrepered"
     />
     <div ref="content" class="allowances__content">
-      <Item />
+      <Item
+        :drawArr="arrData"
+        :startIndex="drawIndex.first"
+        :endIndex="drawIndex.last"
+      />
     </div>
   </div>
 </template>
@@ -22,6 +27,7 @@ export default {
   },
   data() {
     return {
+      isPrepered: false,
       isDraw: false,
       date: new Date(),
       arrData: [],
@@ -107,10 +113,62 @@ export default {
           arrData.unshift(d);
         }
       }
+    },
+    zoomingCanvas(event) {
+      const { wheelDelta } = event;
+      const zoomStep = 0.2;
+      if (wheelDelta < 0) {
+        config.zoom += zoomStep;
+      } else {
+        config.zoom -= zoomStep;
+      }
+      if (config.zoom < 1) {
+        config.zoom = 1;
+      }
+    },
+    setMouseDown(e) {
+      const { swipe } = this;
+      if (e.type === 'mousedown') {
+        this.$refs.content.style.cursor = 'grab';
+        swipe.isMouseDown = true;
+        swipe.prevPosition.x = e.pageX;
+        swipe.time = new Date().getTime();
+      }
+      if (e.type === 'mouseup' || e.type === 'mouseleave') {
+        this.$refs.content.style.cursor = 'default';
+        swipe.isMouseDown = false;
+        swipe.time = null;
+      }
+    },
+    handlerMouseMove(event) {
+      const { swipe } = this;
+      if (!swipe.isMouseDown) return;
+      const curTime = new Date().getTime();
+      if (curTime - swipe.time < 100) return;
+      swipe.time = curTime;
+      swipe.way = this.checkWay(event, swipe.prevPosition) || swipe.way;
+      this.setIndexForDraw(swipe.way, swipe.prevPosition.distance);
+    },
+    checkWay(e, prevPosition = this.swipe.prevPosition) {
+      const curX = e.pageX;
+      const prevX = prevPosition.x;
+      prevPosition.distance = curX - prevX;
+      prevPosition.x = curX;
+      if (prevX < curX) {
+        return config.way.right;
+      }
+      if (prevX > curX) return config.way.left;
     }
   },
   mounted() {
     this.createArrData();
+    this.setIndexForDraw();
+    this.$refs.content.addEventListener('wheel', this.zoomingCanvas);
+    this.$refs.content.addEventListener('mousedown', this.setMouseDown);
+    this.$refs.content.addEventListener('mouseup', this.setMouseDown);
+    this.$refs.content.addEventListener('mouseleave', this.setMouseDown);
+    this.$refs.content.addEventListener('mousemove', this.handlerMouseMove);
+    this.isPrepered = true;
   }
 };
 </script>

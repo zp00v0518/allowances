@@ -8,15 +8,20 @@
 </template>
 
 <script>
-  export default {
-    name: "Item",
+export default {
+  name: 'Item',
+  props: {
+    drawArr: { type: Array, default: () => [] },
+    startIndex: { type: Number, default: 0 },
+    endIndex: { type: Number, default: 0 }
   }
+};
 </script>
 
 <style lang="scss" scoped>
-.allowances__item{
+.allowances__item {
   display: flex;
-  &__header{
+  &__header {
     width: 200px;
     min-width: 200px;
     max-width: 200px;
@@ -24,11 +29,10 @@
     border-left: none;
     border-top: none;
   }
-  &__content{
+  &__content {
     flex: 3;
     width: 100%;
     // border: 1px solid;
-
   }
 }
 </style>
