@@ -1,13 +1,14 @@
 <template>
   <div class="allowances">
     <Header
+      v-if="isPrepered"
       :drawArr="arrData"
       :startIndex="drawIndex.first"
       :endIndex="drawIndex.last"
-      v-if="isPrepered"
     />
     <div ref="content" class="allowances__content">
       <Item
+        v-if="isPrepered"
         :drawArr="arrData"
         :startIndex="drawIndex.first"
         :endIndex="drawIndex.last"
@@ -28,7 +29,6 @@ export default {
   data() {
     return {
       isPrepered: false,
-      isDraw: false,
       date: new Date(),
       arrData: [],
       drawIndex: {
