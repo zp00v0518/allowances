@@ -5,21 +5,26 @@
       :drawArr="arrData"
       :startIndex="drawIndex.first"
       :endIndex="drawIndex.last"
+      :sizeCanvas="sizeCanvas"
     />
     <div ref="content" class="allowances__content">
-      <Item
-        v-if="isPrepered"
-        :drawArr="arrData"
-        :startIndex="drawIndex.first"
-        :endIndex="drawIndex.last"
-      />
+      <template v-if="isPrepered">
+        <Item
+          v-for="index in 2"
+          :drawArr="arrData"
+          :startIndex="drawIndex.first"
+          :endIndex="drawIndex.last"
+          :sizeCanvas="sizeCanvas"
+          :key="index"
+        />
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import modules from './modules';
-import { config, time } from './utils';
+import { config, time, h } from './utils';
 
 export default {
   name: 'Allowances',
@@ -34,6 +39,10 @@ export default {
       drawIndex: {
         first: 0,
         last: 0
+      },
+      sizeCanvas: {
+        width: 0,
+        height: 0
       },
       swipe: {
         isMouseDown: false,
@@ -168,7 +177,11 @@ export default {
     this.$refs.content.addEventListener('mouseup', this.setMouseDown);
     this.$refs.content.addEventListener('mouseleave', this.setMouseDown);
     this.$refs.content.addEventListener('mousemove', this.handlerMouseMove);
+    const size = h.getSizeContainer(this.$el);
+    this.sizeCanvas.width = size.width - 200;
+    console.log(this.sizeCanvas)
     this.isPrepered = true;
+
   }
 };
 </script>
@@ -177,6 +190,7 @@ export default {
 .allowances {
   border: 1px solid;
   box-sizing: border-box;
+  overflow: hidden;
   &__content {
     display: flex;
     flex-direction: column;

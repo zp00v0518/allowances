@@ -12,6 +12,7 @@ export default {
     init() {
       this.canvas = new Canvas(this.$refs.canvas);
       const size = h.getSizeContainer(this.$refs.canvas.parentElement);
+      size.width = this.sizeCanvas.width;
       this.canvas.setSize(size);
     },
     draw(timestamp) {
@@ -47,23 +48,22 @@ export default {
         count++;
       }
     },
-    drawBorder({ ctx, startX, startY, width, height, day }) {
-      const date = new Date(day).getDate();
+    drawBorder({
+      ctx,
+      startX,
+      startY,
+      width,
+      height,
+      way = 'all',
+      options = {}
+    }) {
+      Object.assign(ctx, options);
       ctx.beginPath();
-      if (date !== 1) {
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(startX + width, startY);
-        ctx.lineTo(startX + width, startY + height);
-        ctx.lineTo(startX, startY + height);
-      } else {
-        ctx.moveTo(startX, 0);
-        ctx.lineTo(startX, ctx.canvas.height);
-        ctx.lineTo(startX + width, ctx.canvas.height);
-        ctx.lineTo(startX + width, startY);
-        ctx.lineTo(startX, startY);
-      }
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(startX + width, startY);
+      ctx.lineTo(startX + width, startY + height);
+      ctx.lineTo(startX, startY + height);
       // ctx.lineTo(startX, startY);
-      ctx.lineWidth = 1;
       ctx.stroke();
       ctx.beginPath();
     },
@@ -75,8 +75,10 @@ export default {
       height,
       txt = '',
       align = 'center',
-      size = 10
+      size = 10,
+      options
     }) {
+      Object.assign(ctx, options);
       let x = startX;
       let y = startY;
       ctx.textAlign = align;
@@ -93,8 +95,12 @@ export default {
     }
   },
   mounted() {
-    this.init();
-    requestAnimationFrame(this.draw);
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.init();
+        requestAnimationFrame(this.draw);
+      }, 200);
+    });
   },
   beforeMount() {
     cancelAnimationFrame(this.requestID);

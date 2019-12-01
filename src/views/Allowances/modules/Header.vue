@@ -19,20 +19,22 @@ export default {
   props: {
     drawArr: { type: Array, default: () => [] },
     startIndex: { type: Number, default: 0 },
-    endIndex: { type: Number, default: 0 }
+    endIndex: { type: Number, default: 0 },
+    sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) }
   },
   methods: {
-    drawOneDay({ ctx, startX, startY, width, height, day }) {
+    drawOneDay({ ctx, startX, startY, width, height, day, options = {}}) {
+      Object.assign(ctx, options);
       ctx.fillStyle = 'transparent';
       const date = new Date(day);
       const month = date.getMonth();
       const middleDay = Math.floor(time.dayInMonth[month] / 2);
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        ctx.fillStyle = 'grey';
+        ctx.fillStyle = '#f0f0f2';
       }
       ctx.fillRect(startX, startY, width, height);
-      this.drawBorder({ ctx, startX, startY, width, height, day });
+      this.drawBorder({ ctx, startX, startY, width, height });
       ctx.fillStyle = 'black';
       const num = date.getDate();
       this.drawTxt({
@@ -55,7 +57,7 @@ export default {
         });
       }
     }
-  },
+  }
 };
 </script>
 

@@ -17,7 +17,8 @@ export default {
   props: {
     drawArr: { type: Array, default: () => [] },
     startIndex: { type: Number, default: 0 },
-    endIndex: { type: Number, default: 0 }
+    endIndex: { type: Number, default: 0 },
+    sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) }
   },
   methods: {
     drawOneDay({ ctx, startX, startY, width, height, day }) {
@@ -27,7 +28,7 @@ export default {
       const middleDay = Math.floor(time.dayInMonth[month] / 2);
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        ctx.fillStyle = 'grey';
+        ctx.fillStyle = '#f0f0f2';
       }
       ctx.fillRect(startX, startY, width, height);
       this.drawBorder({ ctx, startX, startY, width, height, day });
@@ -41,17 +42,6 @@ export default {
         height: ctx.canvas.height / 2,
         txt: num
       });
-      if (num === middleDay) {
-        const monthName = time.fullMonths[month];
-        this.drawTxt({
-          ctx,
-          startX,
-          startY: 0,
-          width,
-          height: ctx.canvas.height / 2,
-          txt: monthName
-        });
-      }
     }
   }
 };
@@ -71,7 +61,7 @@ export default {
   }
   &__content {
     flex: 3;
-    width: 100%;
+    // width: 100%;
   }
 }
 </style>
