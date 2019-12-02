@@ -101,7 +101,6 @@ export default {
       height,
       txt = "",
       align = "center",
-      size = 10,
       options
     }) {
       Object.assign(ctx, options);
@@ -112,10 +111,6 @@ export default {
         x += width / 2;
         y += height / 2;
         ctx.textBaseline = "middle";
-      }
-      if (size) {
-        const font = Math.round(size + config.zoom);
-        ctx.font = font + "px Nunito";
       }
       ctx.fillText(txt, x, y);
     }

@@ -21,7 +21,7 @@ export default {
     startIndex: { type: Number, default: 0 },
     endIndex: { type: Number, default: 0 },
     sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) },
-    swipe: {type: Number, default: 0}
+    swipe: { type: Number, default: 0 }
   },
   methods: {
     drawOneDay({ ctx, startX, startY, width, height, day, options = {} }) {
@@ -55,7 +55,7 @@ export default {
       } else {
         this.drawBorder({
           ctx,
-          startX : computedX,
+          startX: computedX,
           startY: 0,
           width,
           height: this.canvas.$height,
@@ -72,15 +72,19 @@ export default {
           options: optionsForBorder
         });
       }
-
-      ctx.fillStyle = "black";
+      const font = Math.round(14 + config.zoom);
+      const optionsForTxt = {
+        fillStyle: "black",
+        font: `bold ${font}px Avenir Helvetica`,
+      };
       this.drawTxt({
         ctx,
         startX: computedX,
         startY: computedY,
         width,
         height: ctx.canvas.height / 2,
-        txt: num
+        txt: num,
+        options: optionsForTxt
       });
       if (num === middleDay) {
         const monthName = time.fullMonths[month];
@@ -90,7 +94,8 @@ export default {
           startY: 0,
           width,
           height: ctx.canvas.height / 2,
-          txt: monthName
+          txt: monthName,
+          options: optionsForTxt
         });
       }
     }

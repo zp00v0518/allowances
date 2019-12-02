@@ -13,6 +13,7 @@ import baseFunc from "./baseFunc";
 
 export default {
   name: "Item",
+  inheritAttrs: false,
   mixins: [baseFunc],
   props: {
     drawArr: { type: Array, default: () => [] },
