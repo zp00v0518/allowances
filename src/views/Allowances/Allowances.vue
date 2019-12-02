@@ -10,12 +10,13 @@
     <div ref="content" class="allowances__content">
       <template v-if="isPrepered">
         <Item
-          v-for="index in 2"
+          v-for="(item, index) in moskData"
           :drawArr="arrData"
           :startIndex="drawIndex.first"
           :endIndex="drawIndex.last"
           :sizeCanvas="sizeCanvas"
           :key="index"
+          :item="item"
         />
       </template>
     </div>
@@ -25,6 +26,7 @@
 <script>
 import modules from './modules';
 import { config, time, h } from './utils';
+import moskData from './moskData';
 
 export default {
   name: 'Allowances',
@@ -33,6 +35,7 @@ export default {
   },
   data() {
     return {
+      moskData,
       isPrepered: false,
       date: new Date(),
       arrData: [],
@@ -66,7 +69,11 @@ export default {
     },
     createArrData(num = this.getNumCell()) {
       const { date, arrData } = this;
-      let curDate = this.date.getTime();
+      date.setHours(0);
+      date.setMinutes(0);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+      let curDate = date.getTime();
       for (let i = 0; i < num; i++) {
         const d = {
           date: curDate

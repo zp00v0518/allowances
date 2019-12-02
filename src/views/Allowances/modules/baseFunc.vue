@@ -1,5 +1,5 @@
 <script>
-import { Canvas, config, time, h } from '../utils';
+import { Canvas, config, time, h } from "../utils";
 
 export default {
   data() {
@@ -54,18 +54,44 @@ export default {
       startY,
       width,
       height,
-      way = 'all',
+      side = "trbl",
       options = {}
     }) {
       Object.assign(ctx, options);
       ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(startX + width, startY);
-      ctx.lineTo(startX + width, startY + height);
-      ctx.lineTo(startX, startY + height);
-      // ctx.lineTo(startX, startY);
-      ctx.stroke();
+      if (side.includes("t")) {
+        drawTopBorder();
+      }
+      if (side.includes("r")) {
+        drawRightBorder();
+      }
+      if (side.includes("b")) {
+        drawBottomBorder();
+      }
+      if (side.includes("l")) {
+        drawLeftBorder();
+      }
       ctx.beginPath();
+      function drawLeftBorder() {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX, startY + height);
+        ctx.stroke();
+      }
+      function drawTopBorder() {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX + width, startY);
+        ctx.stroke();
+      }
+      function drawBottomBorder() {
+        ctx.moveTo(startX, startY + height);
+        ctx.lineTo(startX + width, startY + height);
+        ctx.stroke();
+      }
+      function drawRightBorder() {
+        ctx.moveTo(startX + width, startY);
+        ctx.lineTo(startX + width, startY + height);
+        ctx.stroke();
+      }
     },
     drawTxt({
       ctx,
@@ -73,8 +99,8 @@ export default {
       startY,
       width,
       height,
-      txt = '',
-      align = 'center',
+      txt = "",
+      align = "center",
       size = 10,
       options
     }) {
@@ -82,14 +108,14 @@ export default {
       let x = startX;
       let y = startY;
       ctx.textAlign = align;
-      if (align === 'center') {
+      if (align === "center") {
         x += width / 2;
         y += height / 2;
-        ctx.textBaseline = 'middle';
+        ctx.textBaseline = "middle";
       }
       if (size) {
         const font = Math.round(size + config.zoom);
-        ctx.font = font + 'px Nunito';
+        ctx.font = font + "px Nunito";
       }
       ctx.fillText(txt, x, y);
     }
