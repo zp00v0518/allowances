@@ -149,7 +149,7 @@ export default {
       if (e.type === 'mousedown' || e.type === "touchstart") {
         this.$refs.content.style.cursor = 'grab';
         swipe.isMouseDown = true;
-        swipe.prevPosition.x = e.pageX;
+        swipe.prevPosition.x = e.pageX || e.changedTouches[0].screenX;
         swipe.time = new Date().getTime();
       }
       if (e.type === 'mouseup' || e.type === 'mouseleave' || e.type === "touchend" || e.type === "touchcancel") {
@@ -168,7 +168,7 @@ export default {
       this.setIndexForDraw(swipe.way, swipe.prevPosition.distance);
     },
     checkWay(e, prevPosition = this.swipe.prevPosition) {
-      const curX = e.pageX;
+      const curX = e.pageX || e.changedTouches[0].screenX;
       const prevX = prevPosition.x;
       prevPosition.distance = curX - prevX;
       prevPosition.x = curX;

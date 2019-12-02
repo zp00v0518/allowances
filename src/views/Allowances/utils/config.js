@@ -8,6 +8,6 @@ const config = {
     left: "left",
     right: "right"
   },
-  progress: 15
+  progress: 5
 };
 export default config;
