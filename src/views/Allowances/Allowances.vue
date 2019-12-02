@@ -6,6 +6,7 @@
       :startIndex="drawIndex.first"
       :endIndex="drawIndex.last"
       :sizeCanvas="sizeCanvas"
+      :swipe="swipe.prevPosition.distance"
     />
     <div ref="content" class="allowances__content">
       <template v-if="isPrepered">
@@ -17,6 +18,7 @@
           :sizeCanvas="sizeCanvas"
           :key="index"
           :item="item"
+          :swipe="swipe.prevPosition.distance"
         />
       </template>
     </div>
@@ -65,7 +67,7 @@ export default {
       const width = el.getBoundingClientRect().width;
       const { cell, zoom } = config;
       const num = Math.ceil(parseFloat(width) / (cell.width * zoom));
-      return num;
+      return num + 1;
     },
     createArrData(num = this.getNumCell()) {
       const { date, arrData } = this;
@@ -144,13 +146,13 @@ export default {
     },
     setMouseDown(e) {
       const { swipe } = this;
-      if (e.type === 'mousedown') {
+      if (e.type === 'mousedown' || e.type === "touchstart") {
         this.$refs.content.style.cursor = 'grab';
         swipe.isMouseDown = true;
         swipe.prevPosition.x = e.pageX;
         swipe.time = new Date().getTime();
       }
-      if (e.type === 'mouseup' || e.type === 'mouseleave') {
+      if (e.type === 'mouseup' || e.type === 'mouseleave' || e.type === "touchend" || e.type === "touchcancel") {
         this.$refs.content.style.cursor = 'default';
         swipe.isMouseDown = false;
         swipe.time = null;
@@ -181,9 +183,13 @@ export default {
     this.setIndexForDraw();
     this.$refs.content.addEventListener('wheel', this.zoomingCanvas);
     this.$refs.content.addEventListener('mousedown', this.setMouseDown);
+    this.$refs.content.addEventListener('touchstart', this.setMouseDown);
     this.$refs.content.addEventListener('mouseup', this.setMouseDown);
+    this.$refs.content.addEventListener('touchend', this.setMouseDown);
+    this.$refs.content.addEventListener('touchcancel', this.setMouseDown);
     this.$refs.content.addEventListener('mouseleave', this.setMouseDown);
     this.$refs.content.addEventListener('mousemove', this.handlerMouseMove);
+    this.$refs.content.addEventListener('touchmove', this.handlerMouseMove);
     const size = h.getSizeContainer(this.$el);
     this.sizeCanvas.width = size.width - 200;
     console.log(this.sizeCanvas)

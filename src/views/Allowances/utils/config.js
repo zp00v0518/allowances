@@ -7,6 +7,7 @@ const config = {
   way: {
     left: "left",
     right: "right"
-  }
+  },
+  progress: 15
 };
 export default config;

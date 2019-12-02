@@ -21,7 +21,7 @@ export default {
         this.timer = now;
       }
       const progress = now - this.timer;
-      if (progress > 50) {
+      if (progress > config.progress) {
         this.canvas.clear();
         const startDate = this.drawArr[this.startIndex].date;
         this.drawAllDays({ ctx: this.canvas.$ctx, startDate });

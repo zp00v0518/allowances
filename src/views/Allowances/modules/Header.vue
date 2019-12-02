@@ -20,7 +20,8 @@ export default {
     drawArr: { type: Array, default: () => [] },
     startIndex: { type: Number, default: 0 },
     endIndex: { type: Number, default: 0 },
-    sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) }
+    sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) },
+    swipe: {type: Number, default: 0}
   },
   methods: {
     drawOneDay({ ctx, startX, startY, width, height, day, options = {} }) {
@@ -33,7 +34,9 @@ export default {
       if (dayOfWeek === 0 || dayOfWeek === 6) {
         ctx.fillStyle = "#f0f0f2";
       }
-      ctx.fillRect(startX, startY, width, height);
+      const computedX = startX;
+      const computedY = startY;
+      ctx.fillRect(computedX, computedY, width, height);
 
       const num = date.getDate();
       const optionsForBorder = {
@@ -42,8 +45,8 @@ export default {
       if (num !== 1) {
         this.drawBorder({
           ctx,
-          startX,
-          startY,
+          startX: computedX,
+          startY: computedY,
           width,
           height,
           side: "trb",
@@ -52,7 +55,7 @@ export default {
       } else {
         this.drawBorder({
           ctx,
-          startX,
+          startX : computedX,
           startY: 0,
           width,
           height: this.canvas.$height,
@@ -61,8 +64,8 @@ export default {
         });
         this.drawBorder({
           ctx,
-          startX,
-          startY,
+          startX: computedX,
+          startY: computedY,
           width,
           height,
           side: "trb",
@@ -73,8 +76,8 @@ export default {
       ctx.fillStyle = "black";
       this.drawTxt({
         ctx,
-        startX,
-        startY,
+        startX: computedX,
+        startY: computedY,
         width,
         height: ctx.canvas.height / 2,
         txt: num
@@ -83,7 +86,7 @@ export default {
         const monthName = time.fullMonths[month];
         this.drawTxt({
           ctx,
-          startX,
+          startX: computedX,
           startY: 0,
           width,
           height: ctx.canvas.height / 2,
