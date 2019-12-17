@@ -1,14 +1,18 @@
 <script>
-import { Canvas, config, time, h } from "../utils";
+import { Canvas, config, time, h } from '../utils';
 import moskData from '../moskData';
 let count = 0;
 let bigCount = 1000;
 
 export default {
+  props: {
+    itemIndex: { type: Number }
+  },
   data() {
     return {
       canvas: null,
-      requestId: null
+      requestId: null,
+      infoArr: []
     };
   },
   methods: {
@@ -25,19 +29,29 @@ export default {
       }
       const progress = now - this.timer;
       if (progress > config.progress) {
-        this.canvas.clear();
+        const { infoArr, canvas } = this;
+        canvas.clear();
+        infoArr.length = 0;
         const startDate = this.drawArr[this.startIndex].date;
         this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
-        if (this.darwAllEmployment){
+        if (this.isNotHeader) {
           this.darwAllEmployment({ ctx: this.canvas.$ctx, startDate });
+          if (count < 1) {
+          console.log(infoArr.map(i=> i));
+        }
+        count++;
         }
         this.timer = now;
+        
       }
       this.requestId = requestAnimationFrame(this.draw);
-
+      if (count === bigCount) {
+        count = 0;
+      }
+      
     },
     drawAllDays({ ctx, startDate }) {
-      const { canvas, startIndex, endIndex } = this;
+      const { canvas, startIndex, endIndex, setInfoArr } = this;
       const { cell, zoom } = config;
       const cellWidth = cell.width * zoom;
       const cellHeight = (canvas.$height / 2) * zoom;
@@ -50,8 +64,11 @@ export default {
           startY: canvas.$height / 2,
           width: cellWidth,
           height: cellHeight,
-          item,
+          item
         });
+        if (this.isNotHeader) {
+          setInfoArr(item);
+        }
         count++;
       }
     },
@@ -61,21 +78,21 @@ export default {
       startY,
       width,
       height,
-      side = "trbl",
+      side = 'trbl',
       options = {}
     }) {
       Object.assign(ctx, options);
       ctx.beginPath();
-      if (side.includes("t")) {
+      if (side.includes('t')) {
         drawTopBorder();
       }
-      if (side.includes("r")) {
+      if (side.includes('r')) {
         drawRightBorder();
       }
-      if (side.includes("b")) {
+      if (side.includes('b')) {
         drawBottomBorder();
       }
-      if (side.includes("l")) {
+      if (side.includes('l')) {
         drawLeftBorder();
       }
       ctx.beginPath();
@@ -106,20 +123,31 @@ export default {
       startY,
       width,
       height,
-      txt = "",
-      align = "center",
+      txt = '',
+      align = 'center',
       options
     }) {
       Object.assign(ctx, options);
       let x = startX;
       let y = startY;
       ctx.textAlign = align;
-      if (align === "center") {
+      if (align === 'center') {
         x += width / 2;
         y += height / 2;
-        ctx.textBaseline = "middle";
+        ctx.textBaseline = 'middle';
       }
       ctx.fillText(txt, x, y);
+    },
+    setInfoArr(item) {
+      const { moskData, itemIndex, infoArr } = this;
+      const data = moskData[itemIndex].data;
+      const key = item.date;
+      const elem = data[key];
+      if (elem) {
+        elem.position = item.position;
+        infoArr.push(elem);
+        elem.date = time.getDateString(new Date(key));
+      }
     }
   },
   mounted() {

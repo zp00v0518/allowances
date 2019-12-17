@@ -25,7 +25,7 @@ const listProjects = [
   { name: "third", id: "3" },
   { name: "fourth", id: "4" }
 ];
-const count = 300;
+const count = 200;
 
 function createData(arr) {
   arr.forEach(item => {
@@ -37,8 +37,10 @@ function createData(arr) {
         if (!item.data[key]) {
           item.data[key] = {};
         }
+        item.data[key] = {};
         const field = item.data[key];
-        field[proj.id] = getRandom(4);
+        field.projects = {};
+        field.projects[proj.id] = getRandom(4);
         // field.code = time.getDateString(new Date(key))
       }
     });

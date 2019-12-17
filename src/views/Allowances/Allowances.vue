@@ -31,7 +31,7 @@
 import modules from './modules';
 import { config, time, h } from './utils';
 import moskData from './moskData';
-console.log(moskData)
+console.log(moskData);
 
 export default {
   name: 'Allowances',
@@ -79,7 +79,7 @@ export default {
       for (let i = 0; i < num; i++) {
         const d = {
           date: curDate,
-          code: time.getDateString(new Date(curDate)),
+          code: time.getDateString(new Date(curDate))
         };
         arrData.push(d);
         curDate += time.day;
@@ -124,16 +124,18 @@ export default {
       for (let i = 0; i < num; i++) {
         const d = {};
         if (way === config.way.left) {
-          d.date = time.setMidnight(new Date(lastDate + time.day * (i + 1))).getTime();
+          d.date = time
+            .setMidnight(new Date(lastDate + time.day * (i + 1)))
+            .getTime();
           // d.date = lastDate + time.day * (i + 1);
-          d.code =  time.getDateString(new Date(d.date)),
-          arrData.push(d);
+          (d.code = time.getDateString(new Date(d.date))), arrData.push(d);
         }
         if (way === config.way.right) {
-          d.date = time.setMidnight(new Date(lastDate - time.day * (i + 1))).getTime();
+          d.date = time
+            .setMidnight(new Date(lastDate - time.day * (i + 1)))
+            .getTime();
           // d.date = lastDate - time.day * (i + 1);
-          d.code =  time.getDateString(new Date(d.date)),
-          arrData.unshift(d);
+          (d.code = time.getDateString(new Date(d.date))), arrData.unshift(d);
         }
       }
     },
@@ -151,13 +153,18 @@ export default {
     },
     setMouseDown(e) {
       const { swipe } = this;
-      if (e.type === 'mousedown' || e.type === "touchstart") {
+      if (e.type === 'mousedown' || e.type === 'touchstart') {
         this.$refs.content.style.cursor = 'grab';
         swipe.isMouseDown = true;
         swipe.prevPosition.x = e.pageX || e.changedTouches[0].screenX;
         swipe.time = new Date().getTime();
       }
-      if (e.type === 'mouseup' || e.type === 'mouseleave' || e.type === "touchend" || e.type === "touchcancel") {
+      if (
+        e.type === 'mouseup' ||
+        e.type === 'mouseleave' ||
+        e.type === 'touchend' ||
+        e.type === 'touchcancel'
+      ) {
         this.$refs.content.style.cursor = 'default';
         swipe.isMouseDown = false;
         swipe.time = null;
@@ -198,7 +205,6 @@ export default {
     const size = h.getSizeContainer(this.$el);
     this.sizeCanvas.width = size.width - 200;
     this.isPrepered = true;
-
   }
 };
 </script>

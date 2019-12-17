@@ -1,7 +1,7 @@
 <template>
   <div class="allowances__item">
     <div class="allowances__item__header">
-      <div class="allowances__item__header--title">{{item.name}}</div>
+      <div class="allowances__item__header--title">{{ item.name }}</div>
       <div class="allowances__item__header--arrow">
         <span @click="expandItem">></span>
       </div>
@@ -13,14 +13,14 @@
 </template>
 
 <script>
-import { Canvas, config, time, h } from "../utils";
-import baseFunc from "./baseFunc";
-import moskData from "../moskData";
+import { Canvas, config, time, h } from '../utils';
+import baseFunc from './baseFunc';
+import moskData from '../moskData';
 let count = 0;
 let bigCount = 1000;
 
 export default {
-  name: "Item",
+  name: 'Item',
   inheritAttrs: false,
   mixins: [baseFunc],
   props: {
@@ -29,27 +29,27 @@ export default {
     endIndex: { type: Number, default: 0 },
     sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) },
     item: { type: Object, default: () => ({}) },
-    moskData: { type: Array },
-    itemIndex: { type: Number }
+    moskData: { type: Array }
   },
   data() {
     return {
-      expandClass: "expand"
+      expandClass: 'expand',
+      isNotHeader: true
     };
   },
   methods: {
     drawOneDay({ ctx, startX, startY, width, item }) {
       const day = item.date;
-      ctx.fillStyle = "transparent";
+      ctx.fillStyle = 'transparent';
       const cellHeight = ctx.canvas.height;
       const date = new Date(day);
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        ctx.fillStyle = "#f0f0f2";
+        ctx.fillStyle = '#f0f0f2';
       }
       ctx.fillRect(startX, 0, width, cellHeight);
       const optionsForBorder = {
-        strokeStyle: "#f0f0f2"
+        strokeStyle: '#f0f0f2'
       };
       this.drawBorder({
         ctx,
@@ -58,13 +58,13 @@ export default {
         width,
         height: cellHeight,
         options: optionsForBorder,
-        side: "lr"
+        side: 'lr'
       });
-      ctx.fillStyle = "black";
+      ctx.fillStyle = 'black';
       item.position = {
         startX,
-        endX: startX + width,
-      }
+        endX: startX + width
+      };
     },
     darwAllEmployment({ ctx, startDate }) {
       const { canvas, moskData, drawOneEmployment } = this;
@@ -90,48 +90,48 @@ export default {
       ctx.fillRect(startX, 10, endX - startX, 30);
     },
     getEmployment() {
-      const { startIndex, endIndex, moskData, itemIndex } = this;
-      const arr = this.drawArr.slice(startIndex, endIndex);
+      const { infoArr } = this;
       const { cell, zoom } = config;
       const cellWidth = cell.width * zoom;
       const result = [];
-      let startX = 0;
-      let endX = 0;
 
-      arr.forEach((i, index) => {
-        if (i.position.startX < 0) return;
-        const key = i.date;
-        const item = moskData[itemIndex].data[key];
-        startX = cellWidth * index; 
-        if (item) {
-          const hours = Object.values(item).reduce((acc, i) => (acc += i), 0);
+      infoArr.forEach((elem, index) => {
+        const key = elem.date;
+        const item = elem.projects;
+        const position = elem.position;
+        const hours = Object.values(item).reduce((acc, i) => (acc += i), 0);
+        const template = {
+          hours,
+          dayCount: 0,
+          startX: position.startX,
+          endX: position.endX,
+          startDay: time.getDateString(new Date(key)),
+          endDay: time.getDateString(new Date(key))
+        };
+        const prev = result[result.length - 1];
+        if (!prev) {
           if (hours === 0) return;
-          const template = {
-            hours: 0,
-            dayCount: 0,
-            startX,
-            endX,
-            startDay: key
-          };
-          template.hours = hours;
-          const prev = result[result.length - 1];
-          if (!prev) {
-            template.dayCount++;
-            template.endX += startX + cellWidth;
-            result.push(template);
-            return;
-          }
-          if (prev.hours === template.hours) {
-            prev.dayCount++;
-            prev.endX += cellWidth;
-            prev.endDay = key;
-          } else {
-            template.dayCount++;
-            template.endX += startX + cellWidth;
-            result.push(template);
-          }
+          template.dayCount++;
+          template.endX = template.startX + cellWidth * template.dayCount;
+          result.push(template);
+          return;
         }
-        
+        const prevDay = time.setMidnight(new Date(key)).getTime() - time.day;
+        const checkPrev = time.setMidnight(new Date(prev.endDay)).getTime()
+        if (hours === 0 || prevDay === checkPrev) {
+          prev.endX = prev.startX + cellWidth * prev.dayCount;
+          return;
+        };
+        if (prev.hours === template.hours) {
+          prev.dayCount++;
+          prev.endX = prev.startX + cellWidth * prev.dayCount;
+          prev.endDay = time.getDateString(new Date(key));
+        } else {
+          template.dayCount++;
+          template.endX = template.startX + cellWidth * template.dayCount;
+          template.endDay = time.getDateString(new Date(key));
+          result.push(template);
+        }
       });
       return result;
     },

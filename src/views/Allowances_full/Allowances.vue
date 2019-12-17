@@ -1,5 +1,5 @@
 <template>
-  <div class="allowances">
+  <div class="allowances" ref="content">
     <Header
       v-if="isPrepered"
       :drawArr="arrData"
@@ -8,7 +8,7 @@
       :sizeCanvas="sizeCanvas"
       :swipe="swipe.prevPosition.distance"
     />
-    <div ref="content" class="allowances__content">
+    <!-- <div ref="content" class="allowances__content">
       <template v-if="isPrepered">
         <Item
           v-for="(item, index) in moskData"
@@ -21,7 +21,7 @@
           :swipe="swipe.prevPosition.distance"
         />
       </template>
-    </div>
+    </div> -->
   </div>
 </template>
 
