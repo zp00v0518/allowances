@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Allowances from "../views/Allowances";
+import Allowances_full from "../views/Allowances_full";
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,11 @@ const routes = [
     path: "/allowances",
     name: "Allowances",
     component: Allowances
+  },
+    {
+    path: "/allowances_full",
+    name: "Allowances_full",
+    component: Allowances_full
   },
   {
     path: "/about",
