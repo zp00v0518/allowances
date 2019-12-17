@@ -19,6 +19,8 @@
           :key="index"
           :item="item"
           :swipe="swipe.prevPosition.distance"
+          :moskData="moskData"
+          :itemIndex="index"
         />
       </template>
     </div>
@@ -29,6 +31,7 @@
 import modules from './modules';
 import { config, time, h } from './utils';
 import moskData from './moskData';
+console.log(moskData)
 
 export default {
   name: 'Allowances',
@@ -71,14 +74,12 @@ export default {
     },
     createArrData(num = this.getNumCell()) {
       const { date, arrData } = this;
-      date.setHours(0);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-      let curDate = date.getTime();
+      // time.setMidnight(date);
+      let curDate = time.setMidnight(date).getTime();
       for (let i = 0; i < num; i++) {
         const d = {
-          date: curDate
+          date: curDate,
+          code: time.getDateString(new Date(curDate)),
         };
         arrData.push(d);
         curDate += time.day;
@@ -123,11 +124,15 @@ export default {
       for (let i = 0; i < num; i++) {
         const d = {};
         if (way === config.way.left) {
-          d.date = lastDate + time.day * (i + 1);
+          d.date = time.setMidnight(new Date(lastDate + time.day * (i + 1))).getTime();
+          // d.date = lastDate + time.day * (i + 1);
+          d.code =  time.getDateString(new Date(d.date)),
           arrData.push(d);
         }
         if (way === config.way.right) {
-          d.date = lastDate - time.day * (i + 1);
+          d.date = time.setMidnight(new Date(lastDate - time.day * (i + 1))).getTime();
+          // d.date = lastDate - time.day * (i + 1);
+          d.code =  time.getDateString(new Date(d.date)),
           arrData.unshift(d);
         }
       }
@@ -192,7 +197,6 @@ export default {
     this.$refs.content.addEventListener('touchmove', this.handlerMouseMove);
     const size = h.getSizeContainer(this.$el);
     this.sizeCanvas.width = size.width - 200;
-    console.log(this.sizeCanvas)
     this.isPrepered = true;
 
   }

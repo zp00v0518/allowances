@@ -4,6 +4,8 @@ class Canvas {
     this.$ctx = this.$el.getContext("2d");
     this.$width = this.$el.width;
     this.$height = this.$el.height;
+    this.$help_canvas = document.createElement("canvas");
+    this.$help_ctx = this.$help_canvas.getContext("2d");
   }
   setSize({ width = "300", height = "150" }) {
     let computedWidth = width;
@@ -16,8 +18,8 @@ class Canvas {
     }
     this.$el.setAttribute("width", computedWidth + "px");
     this.$el.setAttribute("height", computedHeight + "px");
-    this.$width = computedWidth;
-    this.$height = computedHeight;
+    this.$width = this.$help_canvas.width = computedWidth;
+    this.$height = this.$help_canvas.height = computedHeight;
   }
   clear() {
     this.$ctx.clearRect(0, 0, this.$width, this.$height);

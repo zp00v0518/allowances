@@ -24,7 +24,8 @@ export default {
     swipe: { type: Number, default: 0 }
   },
   methods: {
-    drawOneDay({ ctx, startX, startY, width, height, day, options = {} }) {
+    drawOneDay({ ctx, startX, startY, width, height, item, options = {} }) {
+      const day = item.date;
       Object.assign(ctx, options);
       ctx.fillStyle = "transparent";
       const date = new Date(day);

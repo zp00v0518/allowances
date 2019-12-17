@@ -1,5 +1,8 @@
 <script>
 import { Canvas, config, time, h } from "../utils";
+import moskData from '../moskData';
+let count = 0;
+let bigCount = 1000;
 
 export default {
   data() {
@@ -25,9 +28,13 @@ export default {
         this.canvas.clear();
         const startDate = this.drawArr[this.startIndex].date;
         this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
+        if (this.darwAllEmployment){
+          this.darwAllEmployment({ ctx: this.canvas.$ctx, startDate });
+        }
         this.timer = now;
       }
       this.requestId = requestAnimationFrame(this.draw);
+
     },
     drawAllDays({ ctx, startDate }) {
       const { canvas, startIndex, endIndex } = this;
@@ -43,7 +50,7 @@ export default {
           startY: canvas.$height / 2,
           width: cellWidth,
           height: cellHeight,
-          day: item.date
+          item,
         });
         count++;
       }
