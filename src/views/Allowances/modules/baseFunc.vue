@@ -1,6 +1,6 @@
 <script>
-import { Canvas, config, time, h } from '../utils';
-import moskData from '../moskData';
+import { Canvas, config, time, h } from "../utils";
+import moskData from "../moskData";
 let count = 0;
 let bigCount = 1000;
 
@@ -36,19 +36,14 @@ export default {
         this.drawAllDays({ ctx: this.canvas.$ctx, startDate });
         if (this.isNotHeader) {
           this.darwAllEmployment({ ctx: this.canvas.$ctx, startDate });
-          if (count < 1) {
-          console.log(infoArr.map(i=> i));
-        }
-        count++;
         }
         this.timer = now;
-        
+        count++;
       }
       this.requestId = requestAnimationFrame(this.draw);
       if (count === bigCount) {
         count = 0;
       }
-      
     },
     drawAllDays({ ctx, startDate }) {
       const { canvas, startIndex, endIndex, setInfoArr } = this;
@@ -78,21 +73,21 @@ export default {
       startY,
       width,
       height,
-      side = 'trbl',
+      side = "trbl",
       options = {}
     }) {
       Object.assign(ctx, options);
       ctx.beginPath();
-      if (side.includes('t')) {
+      if (side.includes("t")) {
         drawTopBorder();
       }
-      if (side.includes('r')) {
+      if (side.includes("r")) {
         drawRightBorder();
       }
-      if (side.includes('b')) {
+      if (side.includes("b")) {
         drawBottomBorder();
       }
-      if (side.includes('l')) {
+      if (side.includes("l")) {
         drawLeftBorder();
       }
       ctx.beginPath();
@@ -123,18 +118,18 @@ export default {
       startY,
       width,
       height,
-      txt = '',
-      align = 'center',
+      txt = "",
+      align = "center",
       options
     }) {
       Object.assign(ctx, options);
       let x = startX;
       let y = startY;
       ctx.textAlign = align;
-      if (align === 'center') {
+      if (align === "center") {
         x += width / 2;
         y += height / 2;
-        ctx.textBaseline = 'middle';
+        ctx.textBaseline = "middle";
       }
       ctx.fillText(txt, x, y);
     },
@@ -142,11 +137,11 @@ export default {
       const { moskData, itemIndex, infoArr } = this;
       const data = moskData[itemIndex].data;
       const key = item.date;
-      const elem = data[key];
+      let elem = data[key];
       if (elem) {
         elem.position = item.position;
-        infoArr.push(elem);
         elem.date = time.getDateString(new Date(key));
+        infoArr.push(elem);
       }
     }
   },
@@ -158,7 +153,7 @@ export default {
       }, 200);
     });
   },
-  beforeMount() {
+  beforeDestroy() {
     cancelAnimationFrame(this.requestID);
   }
 };

@@ -1,4 +1,4 @@
-import {time} from "./utils";
+import { time } from "./utils";
 
 const moskData = [
   {
@@ -16,16 +16,123 @@ const moskData = [
     settings: {
       full: 8
     }
-  }
+  },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
+  // {
+  //   name: "Olga",
+  //   projects: [],
+  //   data: {},
+  //   settings: {
+  //     full: 8
+  //   }
+  // },
 ];
 
 const listProjects = [
   { name: "first", id: "1" },
   { name: "second", id: "2" },
   { name: "third", id: "3" },
-  { name: "fourth", id: "4" }
+  { name: "fourth", id: "4" },
+  { name: "fifth", id: "5" },
+  { name: "sixth", id: "6" },
+  { name: "seven", id: "7" },
 ];
-const count = 200;
+const count = 300;
 
 function createData(arr) {
   arr.forEach(item => {
@@ -40,7 +147,7 @@ function createData(arr) {
         item.data[key] = {};
         const field = item.data[key];
         field.projects = {};
-        field.projects[proj.id] = getRandom(4);
+        field.projects[proj.id] = getRandom(10);
         // field.code = time.getDateString(new Date(key))
       }
     });
@@ -54,7 +161,7 @@ function getRandom(num) {
 function getKey() {
   const month = getRandom(12) + 1;
   const day = getRandom(30) + 1;
-  const date = new Date(`2019-${month}-${day}`)
+  const date = new Date(`2019-${month}-${day}`);
   // time.setMidnight(date);
   return time.setMidnight(date).getTime();
 }

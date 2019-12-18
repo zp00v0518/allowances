@@ -1,26 +1,31 @@
 <template>
-  <div class="allowances__item">
-    <div class="allowances__item__header">
-      <div class="allowances__item__header--title">{{ item.name }}</div>
-      <div class="allowances__item__header--arrow">
-        <span @click="expandItem">></span>
+  <div class="allowances__item" :class="{expandClass: isExpand}">
+    <div class="allowances__item__info">
+      <div class="allowances__item__info__header">
+        <div class="allowances__item__info__header--title">{{ item.name }}</div>
+        <div class="allowances__item__info__header--arrow">
+          <span @click="expandItem">></span>
+        </div>
+      </div>
+      <div class="allowances__item__info__projects" ref="projects">
+        <span v-for="project in item.projects" :key="project.id">{{ project.name }}</span>
       </div>
     </div>
-    <div class="allowances__item__content" ref="content">
+    <div class="allowances__item__content" :class="{expandClass: isExpand}" ref="content">
       <canvas ref="canvas"></canvas>
     </div>
   </div>
 </template>
 
 <script>
-import { Canvas, config, time, h } from '../utils';
-import baseFunc from './baseFunc';
-import moskData from '../moskData';
+import { Canvas, config, time, h } from "../utils";
+import baseFunc from "./baseFunc";
+import moskData from "../moskData";
 let count = 0;
 let bigCount = 1000;
 
 export default {
-  name: 'Item',
+  name: "Item",
   inheritAttrs: false,
   mixins: [baseFunc],
   props: {
@@ -33,23 +38,24 @@ export default {
   },
   data() {
     return {
-      expandClass: 'expand',
-      isNotHeader: true
+      expandClass: "expand",
+      isNotHeader: true,
+      isExpand: false
     };
   },
   methods: {
     drawOneDay({ ctx, startX, startY, width, item }) {
       const day = item.date;
-      ctx.fillStyle = 'transparent';
+      ctx.fillStyle = "transparent";
       const cellHeight = ctx.canvas.height;
       const date = new Date(day);
       const dayOfWeek = date.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
-        ctx.fillStyle = '#f0f0f2';
+        ctx.fillStyle = "#f0f0f2";
       }
       ctx.fillRect(startX, 0, width, cellHeight);
       const optionsForBorder = {
-        strokeStyle: '#f0f0f2'
+        strokeStyle: "#f0f0f2"
       };
       this.drawBorder({
         ctx,
@@ -58,9 +64,9 @@ export default {
         width,
         height: cellHeight,
         options: optionsForBorder,
-        side: 'lr'
+        side: "lr"
       });
-      ctx.fillStyle = 'black';
+      ctx.fillStyle = "black";
       item.position = {
         startX,
         endX: startX + width
@@ -84,10 +90,39 @@ export default {
       }
     },
     drawOneEmployment(item) {
-      const { canvas, moskData } = this;
+      const { canvas, getTxtForEmployment, drawTxt } = this;
       const { hours, startX, endX } = item;
       const ctx = canvas.$ctx;
-      ctx.fillRect(startX, 10, endX - startX, 30);
+      ctx.fillStyle = "black";
+      const width = endX - startX;
+      canvas.roundRect(startX + 1, 10, width - 1, 30, 4, true);
+      // ctx.fillRect(startX + 1, 10, width - 1, 30);
+      const font = Math.round(10 + config.zoom);
+      const options = {
+        fillStyle: "white",
+        font: `normal ${font}px Avenir Helvetica`
+      };
+      const txt = getTxtForEmployment(hours);
+      drawTxt({
+        ctx,
+        startX: startX + 1,
+        startY: 10,
+        width: width - 1,
+        height: 30,
+        txt,
+        options
+      });
+      ctx.fillStyle = "";
+    },
+    getTxtForEmployment(hours) {
+      const { itemIndex, moskData } = this;
+      const data = moskData[itemIndex];
+      const { settings } = data;
+      const { full } = settings;
+      let result = "cvcb";
+      const dif = full - hours;
+      result = dif <= 0 ? "Full" : `${dif} free`;
+      return result;
     },
     getEmployment() {
       const { infoArr } = this;
@@ -96,49 +131,56 @@ export default {
       const result = [];
 
       infoArr.forEach((elem, index) => {
-        const key = elem.date;
-        const item = elem.projects;
+        const dayKey = elem.date;
+        const projects = elem.projects;
         const position = elem.position;
-        const hours = Object.values(item).reduce((acc, i) => (acc += i), 0);
+        const hours = Object.values(projects).reduce((acc, i) => (acc += i), 0);
         const template = {
           hours,
           dayCount: 0,
           startX: position.startX,
           endX: position.endX,
-          startDay: time.getDateString(new Date(key)),
-          endDay: time.getDateString(new Date(key))
+          startDay: dayKey,
+          endDay: dayKey
         };
         const prev = result[result.length - 1];
         if (!prev) {
           if (hours === 0) return;
           template.dayCount++;
           template.endX = template.startX + cellWidth * template.dayCount;
-          result.push(template);
+          result.push(Object.assign({}, template));
           return;
         }
-        const prevDay = time.setMidnight(new Date(key)).getTime() - time.day;
-        const checkPrev = time.setMidnight(new Date(prev.endDay)).getTime()
-        if (hours === 0 || prevDay === checkPrev) {
+        const yesterday = time.getDateString(
+          time.setPastDate(new Date(dayKey), 1)
+        );
+        if (hours === 0) {
           prev.endX = prev.startX + cellWidth * prev.dayCount;
           return;
-        };
-        if (prev.hours === template.hours) {
+        }
+        if (prev.hours === template.hours && yesterday === prev.endDay) {
           prev.dayCount++;
           prev.endX = prev.startX + cellWidth * prev.dayCount;
-          prev.endDay = time.getDateString(new Date(key));
+          prev.endDay = dayKey;
         } else {
           template.dayCount++;
           template.endX = template.startX + cellWidth * template.dayCount;
-          template.endDay = time.getDateString(new Date(key));
-          result.push(template);
+          template.endDay = dayKey;
+          result.push(Object.assign({}, template));
         }
       });
       return result;
     },
     expandItem(event) {
+      this.isExpand = !this.isExpand;
       const target = event.target;
       target.classList.toggle(this.expandClass);
-      this.$refs.content.classList.toggle(this.expandClass);
+      const { $el } = this;
+      const { projects } = this.$refs;
+      const style = projects.getBoundingClientRect();
+      const elStyle = $el.getBoundingClientRect();
+      const computedHeight = this.isExpand ? style.height + elStyle.height : elStyle.height - style.height;
+      $el.style.height = computedHeight + 'px';
     }
   }
 };
@@ -148,39 +190,57 @@ export default {
 .allowances__item {
   display: flex;
   height: 50px;
-  &__header {
-    width: 200px;
-    min-width: 200px;
-    max-width: 200px;
-    border: 1px solid;
-    border-left: none;
-    border-top: none;
-    box-sizing: border-box;
-    display: flex;
-    &--title {
-      flex-basis: 80%;
-      align-items: center;
-      justify-content: center;
-    }
-    &--arrow {
-      font-size: 20px;
-      font-weight: 700;
-      & > span {
-        cursor: pointer;
-        display: block;
-        transition: 0.5s;
-        &.expand {
-          transform: rotate(90deg);
-          position: relative;
-        }
-      }
-    }
-  }
+  transition: 0.3s;
   &__content {
     flex: 3;
     // width: 100%;
     & canvas {
-      border: 1px solid;
+      // border: 1px solid;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+  }
+  &__info {
+    // display: flex;
+    // flex-direction: column;
+    border: 1px solid;
+    border-left: none;
+    border-top: none;
+    box-sizing: border-box;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    overflow: hidden;
+    &__header {
+      display: flex;
+      height: 50px;
+      &--title {
+        flex-basis: 80%;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+      }
+      &--arrow {
+        font-size: 20px;
+        font-weight: 700;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        & > span {
+          cursor: pointer;
+          display: block;
+          transition: 0.5s;
+          &.expand {
+            transform: rotate(90deg);
+            position: relative;
+          }
+        }
+      }
+    }
+    &__projects {
+      flex-direction: column;
+      display: flex;
     }
   }
 }

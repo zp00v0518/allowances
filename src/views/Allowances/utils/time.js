@@ -57,6 +57,7 @@ function setMidnight(date) {
 }
 
 function getDateString(date = new Date(), format = "yyyy-mm-dd") {
+  const copy = new Date(Number(date));
   let result = "";
   const code = {
     yyyy: "year",
@@ -64,9 +65,9 @@ function getDateString(date = new Date(), format = "yyyy-mm-dd") {
     dd: "day"
   };
   const check = {
-    month: date.getMonth() + 1,
-    year: date.getFullYear(),
-    day: date.getDate()
+    month: copy.getMonth() + 1,
+    year: copy.getFullYear(),
+    day: copy.getDate()
   };
 
   const arrFormat = format.split("-");
@@ -78,6 +79,18 @@ function getDateString(date = new Date(), format = "yyyy-mm-dd") {
     }
   });
   return result;
+}
+
+function setPastDate(date = new Date(), days = 1) {
+  const copy = new Date(Number(date));
+  copy.setDate(copy.getDate() - days);
+  return copy;
+}
+
+function setFutureDate(date = new Date(), days = 1) {
+  const copy = new Date(Number(date));
+  copy.setDate(copy.getDate() + days);
+  return copy;
 }
 const time = {
   sec,
@@ -93,7 +106,9 @@ const time = {
   lowercaseShortDays: shortDays.map(d => d.toLowerCase()),
   dayInMonth,
   setMidnight,
-  getDateString
+  getDateString,
+  setPastDate,
+  setFutureDate
 };
 
 export default time;

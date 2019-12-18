@@ -28,13 +28,13 @@
 </template>
 
 <script>
-import modules from './modules';
-import { config, time, h } from './utils';
-import moskData from './moskData';
-console.log(moskData);
+import modules from "./modules";
+import { config, time, h } from "./utils";
+import moskData from "./moskData";
+console.log(moskData)
 
 export default {
-  name: 'Allowances',
+  name: "Allowances",
   components: {
     ...modules
   },
@@ -153,19 +153,19 @@ export default {
     },
     setMouseDown(e) {
       const { swipe } = this;
-      if (e.type === 'mousedown' || e.type === 'touchstart') {
-        this.$refs.content.style.cursor = 'grab';
+      if (e.type === "mousedown" || e.type === "touchstart") {
+        this.$refs.content.style.cursor = "grab";
         swipe.isMouseDown = true;
         swipe.prevPosition.x = e.pageX || e.changedTouches[0].screenX;
         swipe.time = new Date().getTime();
       }
       if (
-        e.type === 'mouseup' ||
-        e.type === 'mouseleave' ||
-        e.type === 'touchend' ||
-        e.type === 'touchcancel'
+        e.type === "mouseup" ||
+        e.type === "mouseleave" ||
+        e.type === "touchend" ||
+        e.type === "touchcancel"
       ) {
-        this.$refs.content.style.cursor = 'default';
+        this.$refs.content.style.cursor = "default";
         swipe.isMouseDown = false;
         swipe.time = null;
       }
@@ -193,18 +193,20 @@ export default {
   mounted() {
     this.createArrData();
     this.setIndexForDraw();
-    this.$refs.content.addEventListener('wheel', this.zoomingCanvas);
-    this.$refs.content.addEventListener('mousedown', this.setMouseDown);
-    this.$refs.content.addEventListener('touchstart', this.setMouseDown);
-    this.$refs.content.addEventListener('mouseup', this.setMouseDown);
-    this.$refs.content.addEventListener('touchend', this.setMouseDown);
-    this.$refs.content.addEventListener('touchcancel', this.setMouseDown);
-    this.$refs.content.addEventListener('mouseleave', this.setMouseDown);
-    this.$refs.content.addEventListener('mousemove', this.handlerMouseMove);
-    this.$refs.content.addEventListener('touchmove', this.handlerMouseMove);
+    this.$refs.content.addEventListener("wheel", this.zoomingCanvas);
+    this.$refs.content.addEventListener("mousedown", this.setMouseDown);
+    this.$refs.content.addEventListener("touchstart", this.setMouseDown);
+    this.$refs.content.addEventListener("mouseup", this.setMouseDown);
+    this.$refs.content.addEventListener("touchend", this.setMouseDown);
+    this.$refs.content.addEventListener("touchcancel", this.setMouseDown);
+    this.$refs.content.addEventListener("mouseleave", this.setMouseDown);
+    this.$refs.content.addEventListener("mousemove", this.handlerMouseMove);
+    this.$refs.content.addEventListener("touchmove", this.handlerMouseMove);
     const size = h.getSizeContainer(this.$el);
     this.sizeCanvas.width = size.width - 200;
-    this.isPrepered = true;
+    this.$nextTick(() => {
+      this.isPrepered = true;
+    });
   }
 };
 </script>

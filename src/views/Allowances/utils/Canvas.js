@@ -24,6 +24,45 @@ class Canvas {
   clear() {
     this.$ctx.clearRect(0, 0, this.$width, this.$height);
   }
+  // https://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
+  roundRect(x, y, width, height, radius, fill, stroke) {
+    if (typeof stroke === "undefined") {
+      stroke = true;
+    }
+    if (typeof radius === "undefined") {
+      radius = 5;
+    }
+    if (typeof radius === "number") {
+      radius = { tl: radius, tr: radius, br: radius, bl: radius };
+    } else {
+      var defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
+      for (var side in defaultRadius) {
+        radius[side] = radius[side] || defaultRadius[side];
+      }
+    }
+    this.$ctx.beginPath();
+    this.$ctx.moveTo(x + radius.tl, y);
+    this.$ctx.lineTo(x + width - radius.tr, y);
+    this.$ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+    this.$ctx.lineTo(x + width, y + height - radius.br);
+    this.$ctx.quadraticCurveTo(
+      x + width,
+      y + height,
+      x + width - radius.br,
+      y + height
+    );
+    this.$ctx.lineTo(x + radius.bl, y + height);
+    this.$ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+    this.$ctx.lineTo(x, y + radius.tl);
+    this.$ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+    this.$ctx.closePath();
+    if (fill) {
+      this.$ctx.fill();
+    }
+    if (stroke) {
+      this.$ctx.stroke();
+    }
+  }
 }
 
 export default Canvas;

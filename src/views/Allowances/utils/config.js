@@ -1,6 +1,6 @@
 const config = {
   cell: {
-    width: 28 * 2.5,
+    width: 28,
     height: 36
   },
   zoom: 1,
