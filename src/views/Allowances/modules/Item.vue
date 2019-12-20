@@ -13,14 +13,22 @@
     </div>
     <div class="allowances__item__content" :class="{expandClass: isExpand}" ref="content">
       <canvas ref="canvas"></canvas>
+      <template v-if="isExpand">
+        <Project
+          v-bind="$props"
+          v-for="project in item.projects"
+          :key="project.id"
+          :project="project"
+        />
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import { Canvas, config, time, h } from "../utils";
+import Project from "./Project";
 import baseFunc from "./baseFunc";
-import moskData from "../moskData";
 let count = 0;
 let bigCount = 1000;
 
@@ -28,6 +36,7 @@ export default {
   name: "Item",
   inheritAttrs: false,
   mixins: [baseFunc],
+  components: { Project },
   props: {
     drawArr: { type: Array, default: () => [] },
     startIndex: { type: Number, default: 0 },
@@ -179,8 +188,10 @@ export default {
       const { projects } = this.$refs;
       const style = projects.getBoundingClientRect();
       const elStyle = $el.getBoundingClientRect();
-      const computedHeight = this.isExpand ? style.height + elStyle.height : elStyle.height - style.height;
-      $el.style.height = computedHeight + 'px';
+      const computedHeight = this.isExpand
+        ? style.height + elStyle.height
+        : elStyle.height - style.height;
+      $el.style.height = computedHeight + "px";
     }
   }
 };
@@ -193,6 +204,8 @@ export default {
   transition: 0.3s;
   &__content {
     flex: 3;
+    overflow: hidden;
+    display: grid;
     // width: 100%;
     & canvas {
       // border: 1px solid;
@@ -241,6 +254,12 @@ export default {
     &__projects {
       flex-direction: column;
       display: flex;
+      & span {
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
   }
 }

@@ -37,6 +37,9 @@ export default {
         if (this.isNotHeader) {
           this.darwAllEmployment({ ctx: this.canvas.$ctx, startDate });
         }
+        if (this.isProject){
+          this.darwAllLineProject();
+        }
         this.timer = now;
         count++;
       }
@@ -147,8 +150,8 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
+      this.init();
       setTimeout(() => {
-        this.init();
         requestAnimationFrame(this.draw);
       }, 200);
     });
