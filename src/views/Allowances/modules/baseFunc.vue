@@ -21,9 +21,9 @@ export default {
       const size = h.getSizeContainer(this.$refs.canvas.parentElement);
       size.width = this.sizeCanvas.width;
       this.canvas.setSize(size);
-      if (this.isProject){
-        document.body.appendChild(this.canvas.$help_canvas)
-      }
+      // if (this.isProject){
+      //   document.body.appendChild(this.canvas.$help_canvas)
+      // }
     },
     draw(timestamp) {
       const now = new Date().getTime();
@@ -33,7 +33,7 @@ export default {
       const progress = now - this.timer;
       if (progress > config.progress) {
         const { infoArr, canvas } = this;
-        canvas.clear();
+        canvas.clear(true);
         infoArr.length = 0;
         const startDate = this.drawArr[this.startIndex].date;
         this.drawAllDays({ ctx: this.canvas.$ctx, startDate });

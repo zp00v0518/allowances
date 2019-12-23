@@ -1,12 +1,12 @@
 <template>
-  <canvas ref="canvas" @mousemove="handlerMouseMove"></canvas>
+  <canvas ref="canvas" @click="handlerMouseMove"></canvas>
 </template>
 
 <script>
 import { Canvas, config, time, h } from "../utils";
 import baseFunc from "./baseFunc";
 let count = 0;
-let bigCount = 2000;
+let bigCount = 1000;
 
 export default {
   name: "Project",
@@ -56,24 +56,31 @@ export default {
       }
     },
     darwAllLineProject() {
-      const { startIndex, endIndex } = this;
+      const { startIndex, endIndex, canvas } = this;
       for (let i = startIndex; i < endIndex; i++) {
         const item = this.drawArr[i];
-        this.drawLineProject(item);
+        const color = item.pickColor || canvas.getRandomColor();
+        item.pickColor = color;
+        this.drawLineProject({ ctx: canvas.$ctx, item });
+        canvas.$data[color] = item;
+        this.drawLineProject({
+          ctx: canvas.$help_ctx,
+          item,
+          color: `rgb(${color})`
+        });
       }
     },
-    drawLineProject(item) {
-      const { canvas, moskData, itemIndex, id } = this;
+    drawLineProject({ ctx, item, color = "red" }) {
+      const { moskData, itemIndex, id } = this;
       const key = time.setMidnight(new Date(item.date)).getTime();
       const data = moskData[itemIndex].data[key];
       if (!data) return;
       const project = data.projects[id];
       if (!project) return;
-      const ctx = canvas.$ctx;
       const position = item.position;
       const height = 20;
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "red";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = color;
       ctx.beginPath();
       ctx.moveTo(position.startX, height);
       ctx.lineTo(position.endX, height);
@@ -81,12 +88,18 @@ export default {
       ctx.closePath();
       ctx.lineWidth = 1;
     },
-    handlerMouseMove(event){
-      
+    handlerMouseMove(event) {
+      const { offsetX, offsetY } = event;
+      const { canvas } = this;
+      const pixel = canvas.$help_ctx.getImageData(offsetX, offsetY, 1, 1).data;
+      const key = `${pixel[0]},${pixel[1]},${pixel[2]}`;
+      const data = canvas.$data[key];
+      const date = data ? data.code : "клик мимо линии проекта";
+      console.log(date);
     }
   },
-  beforeDestroy () {
-    document.body.removeChild(this.canvas.$help_canvas);
+  beforeDestroy() {
+    // document.body.removeChild(this.canvas.$help_canvas);
   }
 };
 </script>
