@@ -43,7 +43,8 @@ export default {
     endIndex: { type: Number, default: 0 },
     sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) },
     item: { type: Object, default: () => ({}) },
-    moskData: { type: Array }
+    moskData: { type: Array },
+    swipe: {type: Object}
   },
   data() {
     return {
@@ -88,6 +89,7 @@ export default {
       const arrEmpolyment = this.getEmployment();
       if (count < 1) {
         console.log(arrEmpolyment);
+        // console.log(this.canvas.getRandomColor());
       }
       count++;
       arrEmpolyment.forEach(item => {
@@ -193,7 +195,7 @@ export default {
         : elStyle.height - style.height;
       $el.style.height = computedHeight + "px";
     }
-  }
+  },
 };
 </script>
 
@@ -201,7 +203,7 @@ export default {
 .allowances__item {
   display: flex;
   height: 50px;
-  transition: 0.3s;
+  transition: 0.2s;
   &__content {
     flex: 3;
     overflow: hidden;

@@ -6,6 +6,7 @@ class Canvas {
     this.$height = this.$el.height;
     this.$help_canvas = document.createElement("canvas");
     this.$help_ctx = this.$help_canvas.getContext("2d");
+    this.$data = {};
   }
   setSize({ width = "300", height = "150" }) {
     let computedWidth = width;
@@ -21,8 +22,11 @@ class Canvas {
     this.$width = this.$help_canvas.width = computedWidth;
     this.$height = this.$help_canvas.height = computedHeight;
   }
-  clear() {
+  clear(help) {
     this.$ctx.clearRect(0, 0, this.$width, this.$height);
+    if (help) {
+      this.$help_ctx.clearRect(0, 0, this.$width, this.$height);
+    }
   }
   // https://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
   roundRect(x, y, width, height, radius, fill, stroke) {
@@ -62,6 +66,18 @@ class Canvas {
     if (stroke) {
       this.$ctx.stroke();
     }
+  }
+  getRandomColor() {
+    const num = 256;
+    const red = Math.floor(Math.random() * num);
+    const green = Math.floor(Math.random() * num);
+    const blue = Math.floor(Math.random() * num);
+    const key = `${red},${green},${blue}`;
+    if (this.$data[key]) {
+      this.getRandomColor();
+      return;
+    }
+    return key;
   }
 }
 

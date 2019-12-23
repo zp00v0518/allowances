@@ -1,7 +1,5 @@
 <template>
-  <!-- <div class="project"> -->
-  <canvas ref="canvas"></canvas>
-  <!-- </div> -->
+  <canvas ref="canvas" @mousemove="handlerMouseMove"></canvas>
 </template>
 
 <script>
@@ -82,7 +80,13 @@ export default {
       ctx.stroke();
       ctx.closePath();
       ctx.lineWidth = 1;
+    },
+    handlerMouseMove(event){
+      
     }
+  },
+  beforeDestroy () {
+    document.body.removeChild(this.canvas.$help_canvas);
   }
 };
 </script>

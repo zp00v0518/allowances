@@ -18,7 +18,7 @@
           :sizeCanvas="sizeCanvas"
           :key="index"
           :item="item"
-          :swipe="swipe.prevPosition.distance"
+          :swipe="swipe"
           :moskData="moskData"
           :itemIndex="index"
         />
@@ -33,7 +33,6 @@ import { config, time, h } from "./utils";
 import moskData from "./moskData";
 window.moskData = moskData;
 window.time = time;
-console.log(moskData)
 
 export default {
   name: "Allowances",

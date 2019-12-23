@@ -21,6 +21,9 @@ export default {
       const size = h.getSizeContainer(this.$refs.canvas.parentElement);
       size.width = this.sizeCanvas.width;
       this.canvas.setSize(size);
+      if (this.isProject){
+        document.body.appendChild(this.canvas.$help_canvas)
+      }
     },
     draw(timestamp) {
       const now = new Date().getTime();
