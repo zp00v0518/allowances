@@ -44,7 +44,7 @@ export default {
     sizeCanvas: { type: Object, default: () => ({ width: 0, height: 0 }) },
     item: { type: Object, default: () => ({}) },
     moskData: { type: Array },
-    swipe: {type: Object}
+    swipe: { type: Object }
   },
   data() {
     return {
@@ -65,7 +65,7 @@ export default {
       }
       ctx.fillRect(startX, 0, width, cellHeight);
       const optionsForBorder = {
-        strokeStyle: "#f0f0f2"
+        strokeStyle: "#F3F3F3"
       };
       this.drawBorder({
         ctx,
@@ -101,27 +101,30 @@ export default {
       }
     },
     drawOneEmployment(item) {
-      const { canvas, getTxtForEmployment, drawTxt } = this;
+      const { canvas, getOptionsForEmployment, drawTxt } = this;
       const { hours, startX, endX } = item;
       const ctx = canvas.$ctx;
-      ctx.fillStyle = "black";
+      const ops = getOptionsForEmployment(hours);
+      // const color = getColorForEmployment(hours);
+      ctx.fillStyle = ops.fillColor;
       const width = endX - startX;
       canvas.roundRect(startX + 1, 10, width - 1, 30, 4, true);
       // ctx.fillRect(startX + 1, 10, width - 1, 30);
       const font = Math.round(10 + config.zoom);
+      // const txt = getTxtForEmployment(hours);
       const options = {
-        fillStyle: "white",
+        fillStyle: ops.txtColor,
         font: `normal ${font}px Avenir Helvetica`
       };
-      const txt = getTxtForEmployment(hours);
       drawTxt({
         ctx,
         startX: startX + 1,
         startY: 10,
         width: width - 1,
         height: 30,
-        txt,
-        options
+        txt: ops.txt,
+        options,
+        align: "left"
       });
       ctx.fillStyle = "";
     },
@@ -130,9 +133,41 @@ export default {
       const data = moskData[itemIndex];
       const { settings } = data;
       const { full } = settings;
-      let result = "cvcb";
       const dif = full - hours;
-      result = dif <= 0 ? "Full" : `${dif} free`;
+      if (dif > 0) return `${dif}h`;
+      if (dif === 0) return "Full";
+      if (dif < 0) return `${Math.abs(dif)}h Overbooked`;
+    },
+    getColorForEmployment(hours) {
+      const { itemIndex, moskData } = this;
+      const data = moskData[itemIndex];
+      const { settings } = data;
+      const { full } = settings;
+      const dif = full - hours;
+      if (dif > 0) return `#74A7F5`;
+      if (dif === 0) return "#EBF7FF";
+      if (dif < 0) return "#F57474";
+    },
+    getOptionsForEmployment(hours) {
+      const { itemIndex, moskData } = this;
+      const data = moskData[itemIndex];
+      const { settings } = data;
+      const { full } = settings;
+      const dif = full - hours;
+      const result = {
+        txt: `${dif}h`,
+        txtColor: "#FFFFFF",
+        fillColor: "#74A7F5" //blue
+      };
+      if (dif === 0) {
+        result.txt = "Full";
+        result.txtColor = "#9798A0";
+        result.fillColor = "#EBF7FF";
+      }
+      if (dif < 0) {
+        result.txt = `${Math.abs(dif)}h Overbooked`;
+        result.fillColor = "#F57474";
+      }
       return result;
     },
     getEmployment() {
@@ -159,7 +194,7 @@ export default {
           if (hours === 0) return;
           template.dayCount++;
           template.endX = template.startX + cellWidth * template.dayCount;
-          result.push(Object.assign({}, template));
+          result.push(template);
           return;
         }
         const yesterday = time.getDateString(
@@ -177,7 +212,7 @@ export default {
           template.dayCount++;
           template.endX = template.startX + cellWidth * template.dayCount;
           template.endDay = dayKey;
-          result.push(Object.assign({}, template));
+          result.push(template);
         }
       });
       return result;
@@ -195,7 +230,7 @@ export default {
         : elStyle.height - style.height;
       $el.style.height = computedHeight + "px";
     }
-  },
+  }
 };
 </script>
 

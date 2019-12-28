@@ -40,7 +40,7 @@ export default {
         if (this.isNotHeader) {
           this.darwAllEmployment({ ctx: this.canvas.$ctx, startDate });
         }
-        if (this.isProject){
+        if (this.isProject) {
           this.darwAllLineProject();
         }
         this.timer = now;
@@ -134,6 +134,10 @@ export default {
       ctx.textAlign = align;
       if (align === "center") {
         x += width / 2;
+        y += height / 2;
+        ctx.textBaseline = "middle";
+      } else if (align === "left") {
+        x += 5;
         y += height / 2;
         ctx.textBaseline = "middle";
       }

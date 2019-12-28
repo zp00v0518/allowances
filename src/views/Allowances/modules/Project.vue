@@ -1,9 +1,13 @@
 <template>
-  <canvas ref="canvas" @click="handlerMouseMove"></canvas>
+  <div class="project">
+    <canvas  ref="canvas" @click="handlerMouseClick"></canvas>
+    <Popup v-if="isShowPopup" :data="popupData" :project="project" :position="popupPosition"/>
+  </div>
 </template>
 
 <script>
 import { Canvas, config, time, h } from "../utils";
+import Popup from "./Popup";
 import baseFunc from "./baseFunc";
 let count = 0;
 let bigCount = 1000;
@@ -11,6 +15,7 @@ let bigCount = 1000;
 export default {
   name: "Project",
   inheritAttrs: false,
+  components: { Popup },
   mixins: [baseFunc],
   props: {
     drawArr: { type: Array, default: () => [] },
@@ -23,7 +28,10 @@ export default {
   data() {
     return {
       id: this.project.id,
-      isProject: true
+      isProject: true,
+      isShowPopup: false,
+      popupData: {},
+      popupPosition: {},
     };
   },
   methods: {
@@ -88,14 +96,17 @@ export default {
       ctx.closePath();
       ctx.lineWidth = 1;
     },
-    handlerMouseMove(event) {
+    handlerMouseClick(event) {
       const { offsetX, offsetY } = event;
-      const { canvas } = this;
+      const { canvas, moskData, itemIndex } = this;
       const pixel = canvas.$help_ctx.getImageData(offsetX, offsetY, 1, 1).data;
       const key = `${pixel[0]},${pixel[1]},${pixel[2]}`;
-      const data = canvas.$data[key];
-      const date = data ? data.code : "клик мимо линии проекта";
-      console.log(date);
+      const item = canvas.$data[key];
+      if (!item) return;
+      const data = moskData[itemIndex].data[item.date];
+      this.popupData = data;
+      this.popupPosition = data.position;
+      this.isShowPopup = true;
     }
   },
   beforeDestroy() {
@@ -107,5 +118,6 @@ export default {
 .project {
   width: 100%;
   height: 50px;
+  position: relative;
 }
 </style>
